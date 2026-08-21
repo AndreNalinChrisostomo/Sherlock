@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.sherlock_datasets/
+.sherlock-code/
+recordings/
+tab-debug.png
