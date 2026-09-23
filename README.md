@@ -33,11 +33,9 @@ Use it to explore a dataset, build a repeatable transformation flow, compare mod
 | **Data Refinery** | Inspect data quality and column profiles, apply preparation steps, and save refined datasets for downstream analysis. |
 | **Visualization Canvas** | Connect data sources, transformations, Python nodes, and charts in a visual directed acyclic graph (DAG). |
 | **AutoAI** | Explore supervised and unsupervised model training, compare experiment results, and monitor connected RL environments. |
-| **Prompt Lab** | Experiment with freeform, structured, and chat prompts, template variables, generation settings, and local mock responses. |
-| **RAG Lab** | Split documents into chunks, build a local vector index, retrieve matching passages, and inspect source citations. |
-| **Agent Lab** | Configure objectives, tools, guardrails, and evaluation cases, then inspect a simulated agent's execution trace. |
 | **Runtime and notebooks** | Organize code and analysis, capture visualization results, and explore simulated execution environments and artifacts. |
-| **Double Pendulum trainer** | Run a separate desktop environment that sends real interaction data to Sherlock's RL API. |
+
+**Not implemented yet:** Prompt Lab, RAG Lab, and Agent Lab. These modules are not available as supported workflows.
 
 The application currently includes Portuguese interface text. This README provides the setup and architectural guide in English.
 
@@ -48,7 +46,6 @@ The application currently includes Portuguese interface text. This README provid
 - **Git** to clone the repository.
 - **Node.js and npm** compatible with the Vite 6 toolchain; Node.js 22 is a practical starting point.
 - **Python 3.12** for the backend setup below. The launcher explicitly checks this version on Windows before trying `python`.
-- **Tkinter**, only if you want to run the optional desktop pendulum application.
 
 ### 2. Clone and install the frontend
 
@@ -109,8 +106,6 @@ The launcher manages port **8001** and the committed Windows launcher stops an e
 6. **Explore AutoAI.** Choose a supported learning workflow and, for supervised training, the target column. Run an experiment and inspect the resulting metrics.
 7. **Document the analysis.** Use notebooks and visualization imports to keep the narrative and results together.
 
-For document-oriented experiments, start with RAG Lab or Prompt Lab instead. These are useful for exploring the interaction design without configuring a hosted model provider.
-
 ## How it works
 
 ```mermaid
@@ -122,12 +117,11 @@ flowchart LR
     API --> Data[Polars + Parquet datasets]
     API --> ML[scikit-learn experiments]
     API --> RL[In-memory RL sessions]
-    Desktop[Double Pendulum desktop app] --> API
 ```
 
 ### Frontend
 
-React 19 and TypeScript implement the studio shell, feature views, contextual tabs, and local lab engines. Vite serves the application during development and creates the production frontend bundle. Visualization and export dependencies include Three.js, html2canvas, and jsPDF.
+React 19 and TypeScript implement the studio shell, feature views and contextual tabs. Vite serves the application during development and creates the production frontend bundle. Visualization and export dependencies include Three.js, html2canvas, and jsPDF.
 
 ### Backend
 
@@ -159,9 +153,9 @@ Sherlock combines working local engines with demonstration modules. Model names 
 | Visualization DAGs and Python nodes | Real backend execution over connected data, with a restricted Python execution scope. |
 | Backend AutoAI training | Local scikit-learn training for supported supervised and unsupervised workflows. |
 | RL trainer | Local policy updates through the session API; an external environment supplies observations and rewards. |
-| Prompt Lab | Local mock models and generated demo responses; no hosted LLM connection is required. |
-| RAG Lab | Local document chunking, hash-based embeddings, and retrieval; it does not require a hosted embedding model or vector database. |
-| Agent Lab | Local simulated agent flow, including mock HTTP calls, tool traces, and guardrail checks. |
+| Prompt Lab | Not implemented yet. |
+| RAG Lab | Not implemented yet. |
+| Agent Lab | Not implemented yet. |
 | Runtime jobs, terminal, and Git sync | Simulated execution helpers; these do not provision kernels, run a general shell, or publish assets to Git. |
 
 ## Configuration
@@ -223,17 +217,7 @@ Sherlock separates the **trainer** from the **environment**:
 4. The backend updates the policy and returns the next action and training metrics.
 5. AutoAI's Adversarial / RL view displays environments associated with that workspace.
 
-### Try the Double Pendulum app
-
-With Sherlock running and the Python environment activated:
-
-```sh
-python pendulum_rl_desktop/double_pendulum_trainer.py
-```
-
-Use `http://127.0.0.1:8001/api` as the direct API base. The app trains multiple candidates, compares their metrics, and lets you disturb the pendulum interactively during evaluation. Evaluation continues to send transitions, so learning can continue during that phase.
-
-See the [desktop trainer guide](pendulum_rl_desktop/README.md) for its detailed workflow. Active RL sessions are held in backend memory and reset when that process restarts.
+Active RL sessions are held in backend memory and reset when that process restarts.
 
 ## API reference
 
@@ -269,9 +253,6 @@ Sherlock/
 |   |-- DataPrepView.tsx        Data Refinery interface
 |   |-- VisualizationCanvasView.tsx
 |   |-- AutoAiView.tsx          AutoAI and RL interface
-|   |-- PromptLabView.tsx       Prompt experiments
-|   |-- RagLabView.tsx          Document retrieval experiments
-|   |-- AgentLabView.tsx        Agent configuration and evaluation
 |   |-- RuntimeLabView.tsx     Runtime and notebook workflows
 |   |-- storage.ts             Browser persistence
 |   `-- studioTabs.ts          Contextual tab state
@@ -279,7 +260,6 @@ Sherlock/
 |   |-- autoai_api.py          FastAPI application and computation engines
 |   |-- requirements.txt       Pinned Python dependencies
 |   `-- test_*.py              Backend regression tests
-|-- pendulum_rl_desktop/        Standalone Tkinter RL environment
 |-- scripts/                    Dataset generators and development utilities
 |-- docs/                       Additional study documentation
 |-- CODEBASE_MAP.md             Detailed architecture and module map
@@ -297,7 +277,6 @@ Sherlock/
 | The browser opens on a different port | Use the exact URL printed by Vite. Browser storage is tied to the origin, including the port. |
 | A large upload cannot become an asset | Create the offered sample. Operational assets cannot exceed 500,000 rows. |
 | RL environments disappear after a restart | Active sessions are in-memory; recreate them from the environment application. |
-| The desktop app cannot import Tkinter | Install the Tk support package for your Python distribution or operating system. |
 | A dataset generator fails to write a file | The generator scripts contain author-specific output paths. Change `outputPath` to an existing local destination before running them. |
 | `npm run preview` loads the UI but API calls fail | Preview serves the frontend bundle. Use the development command for the integrated local setup, or configure backend hosting and `/api` routing separately. |
 
